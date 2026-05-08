@@ -165,22 +165,10 @@ st_min = df["ST"].min()
 df["Vazao_Estimada"] = 0.005 + (1 - (df["ST"] - st_min) / (st_max - st_min)) * 0.03
 
 # --- DADOS GEOESPACIAIS (Coordenadas extraídas do PDF) ---
-# Coordenadas reais das bacias conforme o projeto
-# Foz da Bacia 1: 20°17'22.44" Sul e 50°16'45.41" Oeste
-# Foz da Bacia 2: 20°17'27.36" Sul e 50°16'26.42" Oeste
-
-def converte_coordenada(graus, minutos, segundos, direcao):
-    """Converte coordenadas no formato graus/minutos/segundos para decimal"""
-    decimal = graus + minutos/60 + segundos/3600
-    if direcao in ['S', 'O', 'W']:
-        decimal = -decimal
-    return decimal
-
-# Coordenadas das Bacias
 coordenadas = {
     "Bacia 1 - Pastagem": {
-        "lat": -20.2895667,  # 20°17'22.44" S
-        "lon": -50.2792806,  # 50°16'45.41" O
+        "lat": -20.2895667,
+        "lon": -50.2792806,
         "endereco": "Foz da Bacia 1, Fernandópolis - SP",
         "area_km2": 0.710,
         "uso": "Pastagem",
@@ -188,8 +176,8 @@ coordenadas = {
         "icone": "🌾"
     },
     "Bacia 2 - Cana-de-Açúcar": {
-        "lat": -20.2909333,  # 20°17'27.36" S
-        "lon": -50.2740056,  # 50°16'26.42" O
+        "lat": -20.2909333,
+        "lon": -50.2740056,
         "endereco": "Foz da Bacia 2, Fernandópolis - SP",
         "area_km2": 1.309,
         "uso": "Cana-de-Açúcar",
@@ -198,7 +186,6 @@ coordenadas = {
     }
 }
 
-# Coordenada central de Fernandópolis
 centro_fernandopolis = {
     "lat": -20.2838,
     "lon": -50.2464,
@@ -209,15 +196,13 @@ centro_fernandopolis = {
 def criar_mapa_interativo():
     """Cria um mapa interativo com Folium mostrando as bacias e Fernandópolis"""
     
-    # Criar mapa base centrado em Fernandópolis
     mapa = folium.Map(
         location=[centro_fernandopolis["lat"], centro_fernandopolis["lon"]],
         zoom_start=14,
         control_scale=True,
-        tiles='CartoDB positron'  # Mapa clean e moderno
+        tiles='CartoDB positron'
     )
     
-    # Adicionar camada de satélite como opção
     folium.TileLayer(
         tiles='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
         attr='Esri',
@@ -226,7 +211,6 @@ def criar_mapa_interativo():
         control=True
     ).add_to(mapa)
     
-    # Adicionar camada OpenStreetMap padrão
     folium.TileLayer(
         tiles='OpenStreetMap',
         name='Mapa',
@@ -234,86 +218,55 @@ def criar_mapa_interativo():
         control=True
     ).add_to(mapa)
     
-    # 1. Marcador para a cidade de Fernandópolis
+    # Marcador para Fernandópolis
     folium.Marker(
         location=[centro_fernandopolis["lat"], centro_fernandopolis["lon"]],
         popup=folium.Popup(
             f"""
             <div style="font-family: Arial; width: 200px;">
-                <h4 style="color: #1E88E5; margin-bottom: 5px;">📍 {centro_fernandopolis['nome']}</h4>
-                <hr style="margin: 5px 0;">
-                <p style="margin: 5px 0;"><strong>Sede do Projeto</strong></p>
-                <p style="margin: 5px 0; font-size: 12px;">Município onde as bacias estão localizadas</p>
+                <h4 style="color: #1E88E5;">📍 {centro_fernandopolis['nome']}</h4>
+                <p>Sede do projeto de pesquisa</p>
             </div>
             """,
             max_width=250
         ),
         tooltip="📌 Fernandópolis - SP",
         icon=folium.DivIcon(
-            html=f'''
-            <div style="font-size: 30px; text-align: center; text-shadow: 1px 1px 2px white;">
-                🏙️
-            </div>
-            ''',
+            html='<div style="font-size: 30px;">🏙️</div>',
             icon_size=(30, 30),
             icon_anchor=(15, 15)
         )
     ).add_to(mapa)
     
-    # 2. Adicionar marcadores para as bacias com ícones personalizados
+    # Marcadores para as bacias
     for nome, dados in coordenadas.items():
-        # Criar HTML customizado para o popup
         popup_html = f"""
         <div style="font-family: Arial; min-width: 220px;">
-            <h4 style="color: {dados['cor']}; margin-bottom: 5px;">
-                {dados['icone']} {nome}
-            </h4>
-            <hr style="margin: 5px 0;">
+            <h4 style="color: {dados['cor']};">{dados['icone']} {nome}</h4>
+            <hr>
             <table style="width: 100%; font-size: 12px;">
-                <tr><td><strong>📐 Área:</strong></td><td>{dados['area_km2']} km²</td></table>
-                <tr><td><strong>🌾 Uso do solo:</strong></td><td>{dados['uso']}</td></tr>
-                <tr><td><strong>📍 Localização:</strong></td><td>{dados['endereco']}</td></tr>
-                <tr><td><strong>📊 Dados coletados:</strong></td><td>ST, SD, CE, Vazão</td></tr>
+                <tr><td><strong>Área:</strong></td><td>{dados['area_km2']} km²</td></tr>
+                <tr><td><strong>Uso do solo:</strong></td><td>{dados['uso']}</td></tr>
+                <tr><td><strong>Localização:</strong></td><td>{dados['endereco']}</td></tr>
             </table>
-            <hr style="margin: 5px 0;">
-            <p style="margin: 5px 0; font-size: 11px; color: #666;">
-                Coletas mensais entre 2014-2017
-            </p>
         </div>
         """
         
-        # Calcular tamanho do ícone baseado na área
-        tamanho_icone = 35 if dados['area_km2'] > 1 else 30
-        
-        # Escolher emoji com base no tipo de uso
-        emoji_icone = "🌾" if dados['uso'] == "Pastagem" else "🌱"
+        emoji = "🌾" if dados['uso'] == "Pastagem" else "🌱"
         
         folium.Marker(
             location=[dados["lat"], dados["lon"]],
             popup=folium.Popup(popup_html, max_width=300),
-            tooltip=f"{emoji_icone} {nome} - Clique para detalhes",
+            tooltip=f"{emoji} {nome}",
             icon=folium.DivIcon(
-                html=f'''
-                <div style="
-                    font-size: {tamanho_icone}px; 
-                    text-align: center; 
-                    text-shadow: 1px 1px 2px white;
-                    background-color: rgba(255,255,255,0.7);
-                    border-radius: 50%;
-                    padding: 5px;
-                ">
-                    {emoji_icone}
-                </div>
-                ''',
-                icon_size=(tamanho_icone, tamanho_icone),
-                icon_anchor=(tamanho_icone//2, tamanho_icone//2)
+                html=f'<div style="font-size: 30px;">{emoji}</div>',
+                icon_size=(30, 30),
+                icon_anchor=(15, 15)
             )
         ).add_to(mapa)
         
-        # Adicionar um círculo de raio representativo da área da bacia
-        # Raio em metros: área (km²) * 0.5 para visualização
+        # Círculo representando a área
         raio_metros = dados['area_km2'] * 300
-        
         folium.Circle(
             location=[dados["lat"], dados["lon"]],
             radius=raio_metros,
@@ -321,13 +274,12 @@ def criar_mapa_interativo():
             fill=True,
             fill_opacity=0.15,
             weight=2,
-            popup=f"Área aproximada da {nome}: {dados['area_km2']} km²"
+            popup=f"Área da {nome}: {dados['area_km2']} km²"
         ).add_to(mapa)
     
-    # 3. Adicionar linha representando o Rio Santa Rita (aproximada)
-    # Pontos aproximados do curso do rio entre as bacias e a cidade
+    # Linha do Rio Santa Rita
     pontos_rio = [
-        [-20.2895, -50.2795],  # Próximo Bacia 1
+        [-20.2895, -50.2795],
         [-20.2880, -50.2770],
         [-20.2865, -50.2745],
         [-20.2850, -50.2720],
@@ -337,7 +289,7 @@ def criar_mapa_interativo():
         [-20.2820, -50.2600],
         [-20.2815, -50.2570],
         [-20.2830, -50.2540],
-        [-20.2840, -50.2500],  # Próximo Fernandópolis
+        [-20.2840, -50.2500],
     ]
     
     folium.PolyLine(
@@ -345,50 +297,11 @@ def criar_mapa_interativo():
         color="#1E88E5",
         weight=3,
         opacity=0.7,
-        popup="Rio Santa Rita (curso aproximado)",
+        popup="Rio Santa Rita",
         tooltip="🌊 Rio Santa Rita"
     ).add_to(mapa)
     
-    # 4. Adicionar controle de camadas
     folium.LayerControl(collapsed=False).add_to(mapa)
-    
-    # 5. Adicionar escala
-    folium.plugins.MeasureControl(
-        position='topleft',
-        primary_length_unit='kilometers',
-        secondary_length_unit='meters'
-    ).add_to(mapa)
-    
-    # 6. Adicionar mini-mapa para navegação
-    folium.plugins.MiniMap(
-        toggle_display=True,
-        position='bottomright'
-    ).add_to(mapa)
-    
-    # 7. Adicionar informações adicionais como Legend
-    legend_html = '''
-    <div style="
-        position: fixed; 
-        bottom: 20px; 
-        left: 20px; 
-        z-index: 1000;
-        background-color: white;
-        padding: 10px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        font-family: Arial;
-        font-size: 12px;
-    ">
-        <strong>📖 Legenda</strong><br>
-        <span style="color:#2E7D32;">●</span> Bacia 1 - Pastagem (0,71 km²)<br>
-        <span style="color:#F9A825;">●</span> Bacia 2 - Cana-de-Açúcar (1,31 km²)<br>
-        <span style="color:#1E88E5;">━━</span> Rio Santa Rita<br>
-        <span style="color:#888;">◯</span> Área aproximada da bacia<br>
-        <span>🏙️ Município de Fernandópolis</span>
-    </div>
-    '''
-    
-    mapa.get_root().html.add_child(folium.Element(legend_html))
     
     return mapa
 
@@ -401,32 +314,28 @@ st.markdown("---")
 # --- Mapa Interativo ---
 st.markdown('<div class="sub-header">🗺️ Mapa Interativo da Área de Estudo</div>', unsafe_allow_html=True)
 
-# Informação sobre o mapa
-st.info("💡 **Explore o mapa:** Clique nos marcadores para ver detalhes das bacias. Use o controle de camadas (canto superior direito) para alternar entre mapa e satélite. Você pode dar zoom e arrastar para explorar a região.")
+st.info("💡 **Explore o mapa:** Clique nos marcadores 🌾 e 🌱 para ver detalhes das bacias. Use o controle de camadas (canto superior direito) para alternar entre mapa e satélite.")
 
-# Criar e exibir o mapa
 mapa = criar_mapa_interativo()
-folium_static(mapa, width=1200, height=600)
+folium_static(mapa, width=1200, height=550)
 
-# Informações complementares sobre o mapa
+# Informações das bacias
 col_loc1, col_loc2, col_loc3 = st.columns(3)
 with col_loc1:
     st.markdown("""
     <div class="info-box">
-    <strong>📍 Bacia 1 - Pastagem</strong><br>
-    🌾 Área: 0,71 km²<br>
-    📍 Coordenadas: 20°17’22,44” S | 50°16’45,41” O<br>
-    🌿 Predominância: Pastagem
+    <strong>🌾 Bacia 1 - Pastagem</strong><br>
+    📐 Área: 0,71 km²<br>
+    📍 20°17'22,44" S | 50°16'45,41" O
     </div>
     """, unsafe_allow_html=True)
     
 with col_loc2:
     st.markdown("""
     <div class="info-box">
-    <strong>📍 Bacia 2 - Cana-de-Açúcar</strong><br>
-    🌱 Área: 1,31 km²<br>
-    📍 Coordenadas: 20°17’27,36” S | 50°16’26,42” O<br>
-    🌾 Predominância: Cana-de-Açúcar
+    <strong>🌱 Bacia 2 - Cana-de-Açúcar</strong><br>
+    📐 Área: 1,31 km²<br>
+    📍 20°17'27,36" S | 50°16'26,42" O
     </div>
     """, unsafe_allow_html=True)
     
@@ -435,8 +344,7 @@ with col_loc3:
     <div class="info-box">
     <strong>🏙️ Fernandópolis - SP</strong><br>
     🌡️ Clima: Aw (Tropical úmido)<br>
-    🌧️ Precipitação média: 1.321 mm/ano<br>
-    🌡️ Temperatura média: 23,5°C
+    🌧️ Precipitação: 1.321 mm/ano
     </div>
     """, unsafe_allow_html=True)
 
@@ -450,7 +358,6 @@ col1, col2, col3, col4 = st.columns(4)
 with col1:
     st.markdown('<div class="metric-card">', unsafe_allow_html=True)
     st.metric("📅 Período", f"{df['Data'].min().year} - {df['Data'].max().year}")
-    st.markdown(f"<small>{df['Data'].min().strftime('%b/%Y')} a {df['Data'].max().strftime('%b/%Y')}</small>", unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 with col2:
@@ -471,46 +378,34 @@ with col3:
 
 with col4:
     st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-    st.metric("🗺️ Bacias Analisadas", "2", delta="Pastagem vs Cana-de-Açúcar")
-    st.markdown(f"<small>Área total: {coordenadas['Bacia 1 - Pastagem']['area_km2'] + coordenadas['Bacia 2 - Cana-de-Açúcar']['area_km2']:.1f} km²</small>", unsafe_allow_html=True)
+    st.metric("🗺️ Bacias Analisadas", "2", delta="Pastagem vs Cana")
     st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("---")
 
-# --- GRÁFICOS E ANÁLISES (mantidos da versão anterior) ---
-
-# GRÁFICO 1: Evolução Temporal dos Sólidos Totais
+# --- GRÁFICOS ---
 st.markdown('<div class="sub-header">📈 Evolução Temporal dos Sólidos Totais</div>', unsafe_allow_html=True)
 
 fig1 = px.line(
     df, x="Data", y="ST", color="Manejo",
-    title="<b>Concentração de Sólidos Totais ao Longo do Tempo (2014-2017)</b>",
+    title="<b>Concentração de Sólidos Totais (2014-2017)</b>",
     labels={"Data": "Data da Coleta", "ST": "Sólidos Totais (mg/L)", "Manejo": "Uso do Solo"},
     template="plotly_white",
     markers=True,
     color_discrete_sequence=['#2E7D32', '#F9A825']
 )
-fig1.update_layout(height=500, legend_title_text="Tipo de Manejo")
+fig1.update_layout(height=500)
 st.plotly_chart(fig1, use_container_width=True)
 
-with st.expander("📊 Interpretação - Sólidos Totais"):
-    st.markdown(f"""
-    **Observações importantes:**
-    - A Bacia 2 (Cana-de-Açúcar) apresentou picos muito elevados de sólidos totais, especialmente em novembro/2014 (329.230 mg/L) e fevereiro/2015 (285.350 mg/L)
-    - Estes picos coincidem com períodos de colheita da cana e menor cobertura do solo
-    - A Bacia 1 (Pastagem) manteve concentrações significativamente mais baixas, indicando maior proteção do solo
-    - A diferença média entre as bacias é de aproximadamente **{abs(st_cana - st_pastagem):.0f} mg/L**, sendo a cana-de-açúcar a de maior impacto
-    """)
-
-# GRÁFICO 2: Comparação Boxplot
-st.markdown('<div class="sub-header">⚖️ Comparação Estatística: Pastagem vs Cana-de-Açúcar</div>', unsafe_allow_html=True)
+# --- Boxplots ---
+st.markdown('<div class="sub-header">⚖️ Comparação Estatística</div>', unsafe_allow_html=True)
 
 col_box1, col_box2 = st.columns(2)
 
 with col_box1:
     fig_box = px.box(
         df, x="Manejo", y="ST", color="Manejo",
-        title="Distribuição dos Sólidos Totais por Tipo de Manejo",
+        title="Distribuição dos Sólidos Totais",
         labels={"ST": "Sólidos Totais (mg/L)", "Manejo": ""},
         template="plotly_white",
         color_discrete_sequence=['#2E7D32', '#F9A825']
@@ -521,7 +416,7 @@ with col_box1:
 with col_box2:
     fig_box_ce = px.box(
         df, x="Manejo", y="CE", color="Manejo",
-        title="Distribuição da Condutividade Elétrica por Tipo de Manejo",
+        title="Distribuição da Condutividade Elétrica",
         labels={"CE": "Condutividade (µS/cm)", "Manejo": ""},
         template="plotly_white",
         color_discrete_sequence=['#2E7D32', '#F9A825']
@@ -529,27 +424,27 @@ with col_box2:
     fig_box_ce.update_layout(showlegend=False, height=450)
     st.plotly_chart(fig_box_ce, use_container_width=True)
 
-# GRÁFICO 3: Relação entre Variáveis
-st.markdown('<div class="sub-header">🔍 Relação entre Sólidos Totais e Condutividade</div>', unsafe_allow_html=True)
+# --- Scatter Plot ---
+st.markdown('<div class="sub-header">🔍 Relação entre Variáveis</div>', unsafe_allow_html=True)
 
 fig_scatter = px.scatter(
     df, x="CE", y="ST", color="Manejo", size="Vazao_Estimada",
     hover_data=["Data"], 
     title="<b>Sólidos Totais vs. Condutividade Elétrica</b>",
-    labels={"CE": "Condutividade Elétrica (µS/cm)", "ST": "Sólidos Totais (mg/L)", "Manejo": "Uso do Solo"},
+    labels={"CE": "Condutividade (µS/cm)", "ST": "Sólidos Totais (mg/L)"},
     template="plotly_white",
     color_discrete_sequence=['#2E7D32', '#F9A825']
 )
 fig_scatter.update_layout(height=500)
 st.plotly_chart(fig_scatter, use_container_width=True)
 
-# GRÁFICO 4: Evolução da Condutividade Elétrica
+# --- Evolução da Condutividade ---
 st.markdown('<div class="sub-header">⚡ Evolução da Condutividade Elétrica</div>', unsafe_allow_html=True)
 
 fig_ce = px.line(
     df, x="Data", y="CE", color="Manejo",
     title="<b>Condutividade Elétrica ao Longo do Tempo</b>",
-    labels={"Data": "Data da Coleta", "CE": "Condutividade (µS/cm)", "Manejo": "Uso do Solo"},
+    labels={"Data": "Data da Coleta", "CE": "Condutividade (µS/cm)"},
     template="plotly_white",
     markers=True,
     color_discrete_sequence=['#2E7D32', '#F9A825']
@@ -557,25 +452,64 @@ fig_ce = px.line(
 fig_ce.update_layout(height=450)
 st.plotly_chart(fig_ce, use_container_width=True)
 
-# --- RESUMO ESTATÍSTICO ---
-st.markdown('<div class="sub-header">📊 Resumo Estatístico dos Dados Coletados</div>', unsafe_allow_html=True)
+# --- RESULTADOS E CONCLUSÕES ---
+st.markdown('<div class="sub-header">🎯 Principais Resultados e Conclusões</div>', unsafe_allow_html=True)
 
-col_est1, col_est2, col_est3 = st.columns(3)
+st.markdown("""
+<div class="highlight">
+<strong>📌 Resumo da Pesquisa</strong><br><br>
 
-with col_est1:
-    st.markdown('<div class="highlight">', unsafe_allow_html=True)
-    st.markdown("**🌾 Bacia 1 - Pastagem**")
-    st.markdown(f"""
-    - Sólidos Totais: `{df[df['Manejo']=='Pastagem']['ST'].mean():.0f} ± {df[df['Manejo']=='Pastagem']['ST'].std():.0f}` mg/L
-    - Condutividade: `{df[df['Manejo']=='Pastagem']['CE'].mean():.1f} ± {df[df['Manejo']=='Pastagem']['CE'].std():.1f}` µS/cm
-    - Mediana ST: `{df[df['Manejo']=='Pastagem']['ST'].median():.0f}` mg/L
-    - Nº amostras: `{len(df[df['Manejo']=='Pastagem'])}`
+1. <strong>A bacia com pastagem apresentou significativamente menor transporte de sedimentos</strong> em comparação com a bacia de cana-de-açúcar, demonstrando a importância da cobertura permanente do solo na redução da erosão.
+
+2. <strong>Picos extremos de sólidos totais</strong> (acima de 300.000 mg/L) foram observados na bacia de cana-de-açúcar, associados a períodos de colheita e renovação do canavial.
+
+3. <strong>A condutividade elétrica se mostrou mais elevada na bacia de pastagem</strong>, possivelmente relacionada à fertilização e maior atividade biológica do solo.
+
+4. <strong>Recomenda-se práticas conservacionistas</strong> em áreas de cultivo de cana-de-açúcar, como plantio direto, terraceamento e manutenção de cobertura vegetal entre ciclos.
+
+</div>
+""", unsafe_allow_html=True)
+
+# --- METODOLOGIA ---
+with st.expander("📖 Metodologia da Pesquisa"):
+    st.markdown("""
+    ### Coleta de Dados em Campo
+    
+    **Vazão - Método do Flutuador**
+    - Distância fixa de 1 metro entre estacas
+    - 5 medições de tempo para cada ponto
+    - Velocidade média: v = 0,85 × (d / t_m)
+    - Seções transversais medidas a cada 10 cm
+    
+    **Análises Laboratoriais**
+    - **Sólidos Totais (ST):** Evaporação da amostra não filtrada
+    - **Sólidos em Suspensão (SD):** Filtragem e secagem em estufa (105°C)
+    - **Condutividade Elétrica (CE):** Medição em campo com condutivímetro digital
+    
+    ### Período e Localização
+    
+    - **Período:** Setembro/2014 a Maio/2017
+    - **Local:** Microbacia do Rio Santa Rita, Fernandópolis - SP
+    - **Coordenadas das fozes:** Bacia 1 (Pastagem) e Bacia 2 (Cana-de-açúcar)
     """)
-    st.markdown('</div>', unsafe_allow_html=True)
 
-with col_est2:
-    st.markdown('<div class="highlight">', unsafe_allow_html=True)
-    st.markdown("**🌱 Bacia 2 - Cana-de-Açúcar**")
-    st.markdown(f"""
-    - Sólidos Totais: `{df[df['Manejo']=='Cana-de-Açúcar']['ST'].mean():.0f} ± {df[df['Manejo']=='Cana-de-Açúcar']['ST'].std():.0f}` mg/L
-    - Condutividade: `{df[df['Manejo']=='Cana-de-Açúcar']['CE'].mean():
+# --- TABELA DE DADOS ---
+with st.expander("📋 Ver tabela completa de dados"):
+    df_exibicao = df.copy()
+    df_exibicao["Data"] = df_exibicao["Data"].dt.strftime("%Y-%m-%d")
+    df_exibicao = df_exibicao[["Data", "Bacia", "Manejo", "ST", "SD", "CE", "Vazao_Estimada"]]
+    df_exibicao.columns = ["Data", "Bacia", "Manejo", "ST (mg/L)", "SD (mg/L)", "CE (µS/cm)", "Vazão (m³/s)"]
+    st.dataframe(df_exibicao, use_container_width=True)
+
+# --- RODAPÉ ---
+st.markdown("---")
+st.markdown(
+    """
+    <footer>
+    <strong>Pesquisador:</strong> Amauri Almeida de Souza Junior | <strong>Orientador:</strong> Prof. Dr. Luiz Sergio Vanzela<br>
+    <strong>UNICASTELO - Fernandópolis/SP</strong> | Projeto de Iniciação Científica (2014-2017)<br>
+    <strong>Método:</strong> Flutuador + Análise Gravimétrica | <strong>Parâmetros:</strong> ST, SD, CE, Vazão
+    </footer>
+    """,
+    unsafe_allow_html=True
+)
