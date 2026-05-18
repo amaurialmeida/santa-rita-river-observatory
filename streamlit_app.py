@@ -98,8 +98,8 @@ TRANSLATIONS = {
         "impact_title": "Produção de sedimentos comparativa — Bacias B1 vs. B2 (estimativa relativa)",
         "field_label": "PESQUISA APLICADA",
         "field_title": "A Pesquisa que Saiu do Laboratório",
-        "field_instructions_title": "📁 Como adicionar suas fotos",
-        "field_instructions": "Coloque suas fotos na pasta <code>assets/campo/</code> com os nomes exatos indicados em cada card abaixo. O sistema detecta automaticamente e substitui o placeholder pela imagem real.",
+        "field_instructions_title": "..",
+        "field_instructions": ".",
         "photos": [
             {
                 "emoji": "💧",
@@ -275,8 +275,8 @@ TRANSLATIONS = {
         "impact_title": "Producción de sedimentos comparativa — Cuencas B1 vs. B2 (estimativa relativa)",
         "field_label": "INVESTIGACIÓN APLICADA",
         "field_title": "La Investigación que Salió del Laboratorio",
-        "field_instructions_title": "📁 Cómo agregar sus fotos",
-        "field_instructions": "Coloque sus fotos en la carpeta <code>assets/campo/</code> con los nombres exactos indicados en cada tarjeta. El sistema detecta automáticamente y reemplaza el marcador por la imagen real.",
+        "field_instructions_title": ".",
+        "field_instructions": "..",
         "photos": [
             {"emoji": "💧", "titulo": "Punto B1 — Desembocadura Cuenca 1 (Pastizal)", "desc": "Punto de muestreo en la desembocadura de la Cuenca 1, coordenadas 20°17'22,44\" S / 50°16'45,41\" O. Subcuenca de 0,710 km² con predominancia de pastizal, afluente del Arroyo Santa Rita.", "path": "assets/campo/01_ponto_b1_foz.jpg", "legenda": "Punto de muestreo B1 · Desembocadura Cuenca 1 (Pastizal) · Fernandópolis, SP"},
             {"emoji": "🌾", "titulo": "Punto B2 — Desembocadura Cuenca 2 (Caña de Azúcar)", "desc": "Punto de muestreo en la desembocadura de la Cuenca 2, coordenadas 20°17'27,36\" S / 50°16'26,42\" O. Subcuenca de 1,309 km² con predominancia de caña de azúcar.", "path": "assets/campo/02_ponto_b2_foz.jpg", "legenda": "Punto de muestreo B2 · Desembocadura Cuenca 2 (Caña) · Fernandópolis, SP"},

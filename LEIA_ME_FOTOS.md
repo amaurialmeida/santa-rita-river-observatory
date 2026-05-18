@@ -1,8 +1,5 @@
 # 📷 Pasta de Fotos de Campo — Observatório do Ribeirão Santa Rita
 
-Coloque suas fotos aqui com os nomes EXATOS abaixo.
-O sistema detecta automaticamente e substitui os placeholders.
-
 | Arquivo                              | Conteúdo                                              |
 |--------------------------------------|-------------------------------------------------------|
 | 01_ponto_b1_foz.jpg                  | Ponto de coleta na foz da Bacia 1 (Pastagem)          |
