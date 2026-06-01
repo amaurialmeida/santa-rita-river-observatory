@@ -1004,7 +1004,7 @@ with tab5:
     <div class="escavador-card">
       <strong style="color:#8A6010">{T['escavador_label']}</strong><br>
       <p style="font-size:0.88rem;color:#5C3D1E;margin-top:0.5rem">{T['escavador_text']}</p>
-      <a href="https://www.escavador.com/sobre/8577779/amauri-almeida-de-souza-junior"
+      <a href="https://www.escavador.com/sobre/403010308/amauri-almeida-de-souza-junior"
          target="_blank"
          style="background:#C09020;color:white;padding:6px 16px;border-radius:6px;
                 text-decoration:none;font-size:0.82rem;font-family:'DM Mono',monospace">
